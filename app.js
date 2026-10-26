@@ -34,11 +34,16 @@ function save() { try { localStorage.setItem('hecele', JSON.stringify(S)); } cat
 const synth = window.speechSynthesis;
 let voice = null;
 let speechLog = [];
+const trVoices = () => synth.getVoices().filter(v => v.lang.replace('_', '-').toLowerCase().startsWith('tr'));
+let voiceChosen = false;   // gelişmiş ses bulundu ya da elle seçildi: voice'u açıkça ata
 function pickVoice() {
-  const vs = synth.getVoices();
-  const tr = vs.filter(v => v.lang.replace('_', '-').toLowerCase().startsWith('tr'));
-  // Gelişmiş/Premium (indirilmiş) ses varsa onu tercih et
-  voice = tr.find(v => /premium|enhanced|geliştirilmiş|genişletilmiş|gelişmiş/i.test(v.name + ' ' + v.voiceURI)) || tr[0] || null;
+  const tr = trVoices();
+  let idx = -1;
+  try { idx = parseInt(localStorage.getItem('hecele-voice') ?? '-1', 10); } catch {}
+  if (idx >= 0 && tr[idx]) { voice = tr[idx]; voiceChosen = true; return; }
+  const good = tr.find(v => /premium|enhanced|geliştirilmiş|genişletilmiş|gelişmiş/i.test(v.name + ' ' + v.voiceURI));
+  voice = good || tr[0] || null;
+  voiceChosen = !!good;
 }
 if (synth) { pickVoice(); synth.addEventListener?.('voiceschanged', pickVoice); synth.onvoiceschanged = pickVoice; }
 
@@ -51,7 +56,7 @@ function say(parts, rate = 0.8) {
     for (const p of list) {
       const u = new SpeechSynthesisUtterance(p);
       u.lang = 'tr-TR';
-      if (voice && /premium|enhanced|geliştirilmiş|genişletilmiş|gelişmiş/i.test(voice.name + ' ' + voice.voiceURI)) u.voice = voice;  // varsayılan sesi iOS seçer, iyi sesi biz
+      if (voice && voiceChosen) u.voice = voice;   // varsayılan sesi iOS seçer; seçilmiş sesi biz atarız
       u.rate = rate;
       u.onstart = () => speechLog.push('başladı');
       u.onend = () => speechLog.push('bitti');
@@ -278,7 +283,7 @@ function voiceInfo() {
   if (!synth) return 'Bu tarayıcı sesli okumayı desteklemiyor. Safari ya da Chrome kullanın.';
   if (!voice) pickVoice();
   return voice
-    ? `Türkçe ses bulundu: ${voice.name}. Safari'nin gösterdiği Türkçe sesler: ` + synth.getVoices().filter(v => v.lang.replace('_', '-').toLowerCase().startsWith('tr')).map(v => v.name).join(', ')
+    ? `Kullanılan ses: ${trVoices().indexOf(voice) + 1}. (${trVoices().length} Türkçe ses var: ` + trVoices().map(v => `${v.name} [${(v.voiceURI || '').split('.').slice(-3).join('.')}]`).join(', ') + ')'
     : 'Türkçe ses bulunamadı. iPad: Ayarlar > Erişilebilirlik > Seslendirilen İçerik > Sesler > Türkçe sesi indirin. Ayrıca sessiz modu ve ses seviyesini kontrol edin.';
 }
 function settingsView() {
@@ -295,7 +300,10 @@ function settingsView() {
       <p class="small">Harf sırası Maarif Modeli 1. sınıf ses gruplarını izler: A N E T İ L · O K U R I M · Ü S Ö Y D Z · Ç B G C Ş · P H V Ğ F J.
       Yeni harf açıldıkça Heceler, Oku ve Oyun bölümleri sadece açık harflerle yapılabilen hece ve kelimeleri gösterir.</p>
       <div>
-        <button class="btn ghost" data-act="test-voice">🔊 Sesi dene</button>
+        <div class="row">
+          <button class="btn ghost" data-act="test-voice">🔊 Sesi dene</button>
+          <button class="btn ghost" data-act="next-voice">🔁 Sesi değiştir</button>
+        </div>
         <p class="small" id="voice-info">${voiceInfo()}</p>
       </div>
       <button class="btn ghost" data-act="reset-stars">⭐ Yıldızları sıfırla</button>
@@ -324,6 +332,13 @@ $app.addEventListener('click', e => {
     case 'more': S.unlocked = Math.min(ORDER.length, S.unlocked + 1); save(); render(); break;
     case 'test-voice': speechLog = []; say('Merhaba Atlas, hecele ile okumayı öğrenelim', 0.8);
       setTimeout(() => { const i = document.getElementById('voice-info'); if (i) i.textContent = voiceInfo() + ' | Son deneme: ' + (speechLog.join(' > ') || 'hiçbir şey olmadı'); }, 3500); break;
+    case 'next-voice': {
+      const n = trVoices().length; if (!n) break;
+      const cur = Math.max(0, trVoices().indexOf(voice));
+      try { localStorage.setItem('hecele-voice', String((cur + 1) % n)); } catch {}
+      pickVoice(); speechLog = []; say('Merhaba Atlas, hecele ile okumayı öğrenelim', 0.8);
+      setTimeout(() => { const i = document.getElementById('voice-info'); if (i) i.textContent = voiceInfo(); }, 300); break;
+    }
     case 'reset-stars': S.stars = 0; save(); render(); break;
   }
 });
