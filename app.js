@@ -27,8 +27,9 @@ function load() {
   try {
     const j = JSON.parse(localStorage.getItem('hecele') || '{}');
     return { unlocked: Math.min(Math.max(j.unlocked ?? 4, 1), ORDER.length), stars: j.stars || 0,
-             album: j.album || 0, history: j.history || [], stats: j.stats || {} };
-  } catch { return { unlocked: 4, stars: 0, album: 0, history: [], stats: {} }; }
+             album: j.album || 0, history: j.history || [], stats: j.stats || {},
+             speed: j.speed || 1, made: j.made || 0, booksRead: j.booksRead || [] };
+  } catch { return { unlocked: 4, stars: 0, album: 0, history: [], stats: {}, speed: 1, made: 0, booksRead: [] }; }
 }
 function save() { try { localStorage.setItem('hecele', JSON.stringify(S)); } catch {} }
 
@@ -59,7 +60,7 @@ function say(parts, rate = 0.8, hooks = []) {
       const u = new SpeechSynthesisUtterance(p);
       u.lang = 'tr-TR';
       if (voice && voiceChosen) u.voice = voice;   // varsayılan sesi iOS seçer; seçilmiş sesi biz atarız
-      u.rate = rate;
+      u.rate = rate * (S.speed || 1);
       u.onstart = () => { speechLog.push('başladı'); hooks[i]?.(); };
       u.onend = () => speechLog.push('bitti');
       u.onerror = e => speechLog.push('hata: ' + e.error);
@@ -103,6 +104,11 @@ function pick(pool, avoid) {
   for (const x of src) { r -= weight(x); if (r <= 0) return x; }
   return src[src.length - 1];
 }
+function earnStar(n = 1) {
+  const before = S.album;
+  S.stars += n; S.album = Math.min(STICKERS.length, S.album + n); save();
+  return STICKERS.slice(before, S.album);
+}
 function record(item, ok) {
   const st = S.stats[item] ||= { ok: 0, no: 0 };
   st[ok ? 'ok' : 'no']++;
@@ -125,10 +131,11 @@ let cur = {};   // ekrana özel durum
 function go(v, extra = {}) { view = v; cur = extra; synth?.cancel(); render(); }
 
 function render() {
-  const f = { home, letters: lettersView, letter: letterView, syl: sylView, build: buildView, read: readView, sent: sentView, write: writeView, album: albumView, quiz: quizView, result: resultView, settings: settingsView }[view];
+  const f = { home, letters: lettersView, letter: letterView, syl: sylView, build: buildView, read: readView, sent: sentView, write: writeView, album: albumView, make: makeView, books: booksView, book: bookView, bookend: bookEndView, quiz: quizView, result: resultView, settings: settingsView }[view];
   if (view === 'syl' && !cur.item) nextSyl(true);
   $app.innerHTML = f();
   if (view === 'write') initCanvas();
+  if (view === 'make' && cur.say) { const w = cur.say; cur.say = null; say(w, 0.7); }
 }
 
 function home() {
@@ -139,7 +146,9 @@ function home() {
       <button class="m1" data-act="go" data-v="letters"><span>🔤</span>Harfler</button>
       <button class="m2" data-act="go" data-v="syl"><span>🧩</span>Heceler</button>
       <button class="m3" data-act="go" data-v="read"><span>📚</span>Oku</button>
+      <button class="m7" data-act="go" data-v="make"><span>🧱</span>Kelime Kur</button>
       <button class="m5" data-act="go" data-v="sent"><span>💬</span>Cümle</button>
+      <button class="m8" data-act="go" data-v="books"><span>📕</span>Kitap</button>
       <button class="m6" data-act="go" data-v="write"><span>✍️</span>Yaz</button>
       <button class="m4" data-act="go" data-v="quiz"><span>🎯</span>Oyun</button>
     </div>
@@ -305,6 +314,96 @@ function resultView() {
       ${cur.won.length ? `<div class="example">Yeni dost: <span class="pic-inline">${cur.won.join(' ')}</span></div>` : ''}
       <div class="row">
         <button class="btn big" data-act="go" data-v="quiz">Tekrar oyna</button>
+        <button class="btn big ghost" data-act="home">Ana ekran</button>
+      </div>
+    </div>`;
+}
+
+/* Kelime Kur: karışık heceleri sırayla dizerek kelimeyi oluştur */
+function nextMake(first) {
+  const all = wordPool().filter(w => w.includes('-'));
+  const withPic = all.filter(w => EMOJI[w.replace(/-/g, '')]);
+  const pool = withPic.length >= 3 && Math.random() < 0.75 ? withPic : all;   // çoğunlukla resimli kelimeler
+  cur.item = pool.length ? pick(pool, cur.item) : null;
+  if (cur.item) {
+    cur.sy = cur.item.split('-'); cur.placed = 0; cur.done = false; cur.missed = false;
+    cur.tiles = shuffle(cur.sy.map((s, i) => ({ s, id: i }))); cur.used = new Set();
+    cur.say = cur.item.replace(/-/g, '');
+  }
+  if (!first) render();
+}
+function makeView() {
+  if (cur.item === undefined) nextMake(true);
+  if (!cur.item) return header('Kelime Kur') + `<div class="stage"><p class="hint">Kelime kurmak için iki heceli kelimeler gerekir. Ayarlardan daha fazla harf aç.</p></div>`;
+  const w = cur.item.replace(/-/g, ''), pic = EMOJI[w];
+  const slots = cur.sy.map((x, i) => `<span class="slot ${i < cur.placed ? 'full' : ''}">${i < cur.placed ? colorize(x) : ''}</span>`).join('');
+  const tiles = cur.tiles.filter(t => !cur.used.has(t.id)).map(t => `<button class="tile-syl" data-act="make-pick" data-id="${t.id}" data-v="${t.s}">${colorize(t.s)}</button>`).join('');
+  return header('Kelime Kur') + `
+    <div class="stage">
+      <div class="emoji-reveal">${pic || '🔊'}</div>
+      <div class="slots">${slots}</div>
+      ${cur.done
+        ? `<div class="example">${cur.won ? '🎉 Yeni dost: ' + cur.won.join(' ') : '✅ Aferin!'}</div>
+           <button class="btn big" data-act="make-next">Sıradaki ➡️</button>`
+        : `<div class="tiles">${tiles}</div>
+           <p class="hint">Heceleri doğru sıraya diz</p>
+           <button class="btn ghost" data-act="make-hear">🔊 Dinle</button>`}
+    </div>`;
+}
+function makePick(btn) {
+  if (cur.done) return;
+  const v = btn.dataset.v;
+  if (v === cur.sy[cur.placed]) {
+    cur.used.add(+btn.dataset.id); cur.placed++;
+    if (cur.placed === cur.sy.length) {
+      cur.done = true; cur.won = null;
+      record(cur.item, !cur.missed);
+      S.made++; if (S.made % 5 === 0) cur.won = earnStar(1); else save();
+      say(cur.item.replace(/-/g, ''), 0.7);
+    } else say(v, 0.7);
+    render();
+  } else {
+    btn.classList.add('no'); cur.missed = true; say(v, 0.7);
+    setTimeout(() => btn.classList.remove('no'), 400);
+  }
+}
+
+/* Kitaplık */
+const bookNeed = b => Math.max(...b.pages.flatMap(([t]) => [...t.toLocaleLowerCase('tr-TR').replace(/[^a-zçğıöşü]/g, '')].map(c => ORDER.indexOf(c) + 1)));
+function booksView() {
+  const items = BOOKS.map((b, i) => {
+    const need = bookNeed(b), open = need <= S.unlocked, read = S.booksRead.includes(b.title);
+    return open
+      ? `<button class="book" data-act="open-book" data-i="${i}"><span>${b.emoji}</span><b>${b.title}</b><small>${read ? '✅ okudun' : b.pages.length + ' sayfa'}</small></button>`
+      : `<button class="book locked" disabled><span>🔒</span><b>${b.title}</b><small>${need}. harfe kadar öğrenince açılır</small></button>`;
+  }).join('');
+  return header('Kitaplık') + `<div class="books">${items}</div>`;
+}
+function bookView() {
+  const b = BOOKS[cur.bi], [text, pic] = b.pages[cur.pg];
+  const words = text.split(' ').map((w, i) => `<span class="sw" data-act="say-sw" data-v="${w.replace(/[^\p{L}]/gu, '')}" data-i="${i}">${w}</span>`).join(' ');
+  const last = cur.pg === b.pages.length - 1;
+  const dots = b.pages.map((_, i) => `<span class="dot ${i < cur.pg ? 'done' : i === cur.pg ? 'now' : ''}"></span>`).join('');
+  return header(b.title) + `
+    <div class="progress">${dots}</div>
+    <div class="stage">
+      <div class="emoji-reveal">${pic}</div>
+      <div class="big-card sentence">${words}</div>
+      <div class="row">
+        <button class="icon-btn" data-act="book-prev" ${cur.pg ? '' : 'disabled'}>⬅️</button>
+        <button class="btn big" data-act="read-sent">🔊 Oku</button>
+        <button class="btn big ghost" data-act="book-next">${last ? 'Bitir 🎉' : '➡️'}</button>
+      </div>
+    </div>`;
+}
+function bookEndView() {
+  return header('Kitap bitti', false) + `
+    <div class="stage">
+      <div class="result-stars">🎉</div>
+      <div class="example">“${BOOKS[cur.bi].title}” kitabını okudun!</div>
+      ${cur.won?.length ? `<div class="example">Yeni dost: <span class="pic-inline">${cur.won.join(' ')}</span></div>` : ''}
+      <div class="row">
+        <button class="btn big" data-act="go" data-v="books">Kitaplık</button>
         <button class="btn big ghost" data-act="home">Ana ekran</button>
       </div>
     </div>`;
@@ -478,6 +577,12 @@ function settingsView() {
       <p class="small">Harf sırası Maarif Modeli 1. sınıf ses gruplarını izler: A N E T İ L · O K U R I M · Ü S Ö Y D Z · Ç B G C Ş · P H V Ğ F J.
       Yeni harf açıldıkça Heceler, Oku ve Oyun bölümleri sadece açık harflerle yapılabilen hece ve kelimeleri gösterir.</p>
       <div>
+        <b>Okuma hızı</b>
+        <div class="row">
+          ${[['🐢 Yavaş', 0.75], ['Normal', 1], ['🐇 Hızlı', 1.25]].map(([t, v]) => `<button class="btn ghost ${S.speed === v ? 'on' : ''}" data-act="speed" data-v="${v}">${t}</button>`).join('')}
+        </div>
+      </div>
+      <div>
         <div class="row">
           <button class="btn ghost" data-act="test-voice">🔊 Sesi dene</button>
           <button class="btn ghost" data-act="next-voice">🔁 Sesi değiştir</button>
@@ -512,6 +617,19 @@ $app.addEventListener('click', e => {
     case 'hard-word': record(cur.item, false); save(); sayWordBySyllable(cur.item); break;
     case 'next-word': record(cur.item, true); save(); nextWord(); break;
     case 'say-sw': say(v, 0.7); break;
+    case 'make-pick': makePick(el); break;
+    case 'make-next': nextMake(); break;
+    case 'make-hear': say(cur.item.replace(/-/g, ''), 0.7); break;
+    case 'open-book': go('book', { bi: +el.dataset.i, pg: 0 }); break;
+    case 'book-prev': cur.pg--; render(); break;
+    case 'book-next': {
+      const b = BOOKS[cur.bi];
+      if (cur.pg < b.pages.length - 1) { cur.pg++; render(); break; }
+      let won = [];
+      if (!S.booksRead.includes(b.title)) { S.booksRead.push(b.title); won = earnStar(1); }
+      go('bookend', { bi: cur.bi, won }); say('Aferin! Kitabı bitirdin!', 0.9); break;
+    }
+    case 'speed': S.speed = parseFloat(v); save(); render(); say('Merhaba Atlas', 0.8); break;
     case 'read-sent': readSentence(); break;
     case 'next-sent': nextSent(); break;
     case 'w-prev': cur.wi = Math.max(0, cur.wi - 1); render(); break;

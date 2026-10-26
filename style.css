@@ -131,3 +131,23 @@ header.bar h1 { margin: 0; font-size: 1.6rem; }
 .ready { background: #e3f6d9; border-radius: 12px; padding: 6px 10px; font-weight: 700; }
 
 #pad.ok { outline: 6px solid var(--ok); }
+
+.menu .m7 { background: #d9f2f0; } .menu .m8 { background: #ffe0cc; }
+.menu button { min-height: 96px; padding: 12px; }
+.menu button span { font-size: clamp(2.2rem, 7vw, 3.4rem); }
+.btn.on { background: var(--accent); }
+
+/* Kelime Kur */
+.slots { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.slot { min-width: 90px; height: 90px; padding: 0 12px; border: 4px dashed var(--muted); border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 800; background: #fff; }
+.slot.full { border-style: solid; border-color: var(--ok); }
+.tiles { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+.tile-syl { background: var(--card); border-radius: 24px; padding: 14px 26px; font-size: 3rem; font-weight: 800; box-shadow: 0 7px 0 rgba(0,0,0,.1); }
+.tile-syl:active { transform: translateY(5px); box-shadow: 0 2px 0 rgba(0,0,0,.1); }
+.tile-syl.no { background: #ffd0da; animation: shake .35s; }
+
+/* Kitaplık */
+.books { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+.book { background: var(--card); border-radius: 24px; padding: 18px 10px; box-shadow: 0 6px 0 rgba(0,0,0,.1); display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.book span { font-size: 3.4rem; } .book b { font-size: 1.2rem; } .book small { opacity: .65; }
+.book.locked { background: #ece9dc; box-shadow: none; opacity: .75; cursor: default; }
