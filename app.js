@@ -31,22 +31,31 @@ function load() {
 function save() { try { localStorage.setItem('hecele', JSON.stringify(S)); } catch {} }
 
 /* ---------- Ses ---------- */
+const synth = window.speechSynthesis;
 let voice = null;
+let lastSpeechError = '';
 function pickVoice() {
-  const vs = speechSynthesis.getVoices();
-  voice = vs.find(v => v.lang.toLowerCase().startsWith('tr')) || null;
+  const vs = synth.getVoices();
+  voice = vs.find(v => v.lang.replace('_', '-').toLowerCase().startsWith('tr')) || null;
 }
-if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+if (synth) { pickVoice(); synth.addEventListener?.('voiceschanged', pickVoice); synth.onvoiceschanged = pickVoice; }
 
+// iOS Safari: cancel() hemen ardından speak() gelirse konuşma yutulur; bu yüzden kısa bekleriz.
 function say(parts, rate = 0.8) {
-  if (!('speechSynthesis' in window)) return;
-  speechSynthesis.cancel();
-  for (const p of [].concat(parts)) {
-    const u = new SpeechSynthesisUtterance(p);
-    u.lang = 'tr-TR'; if (voice) u.voice = voice;
-    u.rate = rate;
-    speechSynthesis.speak(u);
-  }
+  if (!synth) return;
+  const list = [].concat(parts);
+  const run = () => {
+    if (!voice) pickVoice();
+    for (const p of list) {
+      const u = new SpeechSynthesisUtterance(p);
+      u.lang = 'tr-TR'; if (voice) u.voice = voice;
+      u.rate = rate;
+      u.onerror = e => { lastSpeechError = e.error || 'bilinmeyen hata'; };
+      synth.speak(u);
+    }
+    if (synth.paused) synth.resume();
+  };
+  if (synth.speaking || synth.pending) { synth.cancel(); setTimeout(run, 80); } else run();
 }
 const sayLetter = c => say(SPEAK[c] || c, 0.7);
 const sayWord = w => say(w.replace(/-/g, ''), 0.75);
@@ -91,7 +100,7 @@ const header = (title, back = true) => `
 let view = 'home';
 let cur = {};   // ekrana özel durum
 
-function go(v, extra = {}) { view = v; cur = extra; speechSynthesis?.cancel(); render(); }
+function go(v, extra = {}) { view = v; cur = extra; synth?.cancel(); render(); }
 
 function render() {
   const f = { home, letters: lettersView, letter: letterView, syl: sylView, build: buildView, read: readView, quiz: quizView, result: resultView, settings: settingsView }[view];
@@ -260,6 +269,13 @@ function resultView() {
 }
 
 /* Ayarlar (ebeveyn) */
+function voiceInfo() {
+  if (!synth) return 'Bu tarayıcı sesli okumayı desteklemiyor. Safari ya da Chrome kullanın.';
+  if (!voice) pickVoice();
+  return voice
+    ? `Türkçe ses bulundu: ${voice.name}`
+    : 'Türkçe ses bulunamadı. iPad: Ayarlar > Erişilebilirlik > Seslendirilen İçerik > Sesler > Türkçe sesi indirin. Ayrıca sessiz modu ve ses seviyesini kontrol edin.';
+}
 function settingsView() {
   const learned = letters().map(c => `<span>${up(c)}${c}</span>`).join('');
   return header('Ayarlar') + `
@@ -273,6 +289,10 @@ function settingsView() {
       <div class="learned">${learned}</div>
       <p class="small">Harf sırası Maarif Modeli 1. sınıf ses gruplarını izler: A N E T İ L · O K U R I M · Ü S Ö Y D Z · Ç B G C Ş · P H V Ğ F J.
       Yeni harf açıldıkça Heceler, Oku ve Oyun bölümleri sadece açık harflerle yapılabilen hece ve kelimeleri gösterir.</p>
+      <div>
+        <button class="btn ghost" data-act="test-voice">🔊 Sesi dene</button>
+        <p class="small" id="voice-info">${voiceInfo()}</p>
+      </div>
       <button class="btn ghost" data-act="reset-stars">⭐ Yıldızları sıfırla</button>
     </div>`;
 }
@@ -297,6 +317,8 @@ $app.addEventListener('click', e => {
     case 'answer': answer(el); break;
     case 'less': S.unlocked = Math.max(1, S.unlocked - 1); save(); render(); break;
     case 'more': S.unlocked = Math.min(ORDER.length, S.unlocked + 1); save(); render(); break;
+    case 'test-voice': say('Merhaba Atlas, hecele ile okumayı öğrenelim', 0.8);
+      setTimeout(() => { const i = document.getElementById('voice-info'); if (i) i.textContent = voiceInfo() + (lastSpeechError ? ` (hata: ${lastSpeechError})` : ''); }, 1500); break;
     case 'reset-stars': S.stars = 0; save(); render(); break;
   }
 });
