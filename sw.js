@@ -1,5 +1,5 @@
-const CACHE = 'hecele-v2';
-const FILES = ['./', 'index.html', 'style.css', 'words.js', 'app.js', 'manifest.webmanifest'];
+const CACHE = 'hecele-v3';
+const FILES = ['./', 'index.html', 'style.css', 'words.js', 'sentences.js', 'app.js', 'manifest.webmanifest'];
 
 self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES))); });
 self.addEventListener('activate', e => e.waitUntil(

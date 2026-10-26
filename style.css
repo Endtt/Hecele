@@ -41,10 +41,11 @@ header.bar h1 { margin: 0; font-size: 1.6rem; }
 .menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; flex: 1; }
 .menu button {
   background: var(--card); border-radius: var(--radius); padding: 20px; font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 800;
-  box-shadow: 0 8px 0 rgba(0,0,0,.1); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 150px;
+  box-shadow: 0 8px 0 rgba(0,0,0,.1); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 110px;
 }
 .menu button span { font-size: clamp(2.6rem, 8vw, 4rem); }
 .menu button:active { transform: translateY(5px); box-shadow: 0 3px 0 rgba(0,0,0,.1); }
+.menu .m5 { background: #f0e1ff; } .menu .m6 { background: #ffe6cc; }
 .menu .m1 { background: #ffe0e6; } .menu .m2 { background: #dcefff; } .menu .m3 { background: #e3f6d9; } .menu .m4 { background: #fff0c2; }
 
 /* Harf ızgarası */
@@ -101,3 +102,30 @@ header.bar h1 { margin: 0; font-size: 1.6rem; }
 .learned { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; font-size: 1.6rem; font-weight: 800; }
 .learned span { background: #fff3b0; border-radius: 12px; padding: 2px 10px; }
 .small { font-size: .95rem; opacity: .7; margin: 0; }
+
+/* Birleştirme / okuma vurgusu */
+.v, .c { display: inline-block; transition: transform .2s; }
+.hl { transform: scale(1.3); background: #fff3b0; border-radius: 12px; }
+.sw.hl, .sy.hl { transform: none; background: #fff3b0; border-radius: 14px; }
+
+/* Cümle */
+.big-card.sentence { font-size: clamp(2.2rem, 8vw, 4rem); line-height: 1.35; cursor: default; }
+.sw { display: inline-block; padding: 0 .12em; border-radius: 14px; cursor: pointer; }
+
+/* Yaz */
+#pad { background: #fff; border-radius: 28px; box-shadow: 0 8px 0 rgba(0,0,0,.1); touch-action: none; max-width: 100%; }
+
+/* Albüm */
+.album { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 12px; width: 100%; }
+.sticker { background: #fff; border-radius: 22px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 3rem; box-shadow: 0 5px 0 rgba(0,0,0,.08); }
+.sticker.off { opacity: .35; }
+.pic-inline { font-size: 3rem; }
+
+/* Konfeti */
+.confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 5; }
+.confetti span { position: absolute; top: -10%; font-size: 2rem; animation: fall 2.6s linear forwards; }
+@keyframes fall { to { transform: translateY(115vh) rotate(360deg); } }
+
+/* Ebeveyn ilerleme */
+.progress-box { background: #fffaf0; border: 2px dashed #e4dfcb; border-radius: 18px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 1rem; }
+.ready { background: #e3f6d9; border-radius: 12px; padding: 6px 10px; font-weight: 700; }
