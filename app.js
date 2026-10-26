@@ -82,11 +82,13 @@ function wordPool() {
   const L = new Set(letters());
   return [...new Set(WORDS)].filter(w => [...w.replace(/-/g, '')].every(c => L.has(c)));
 }
-function sylPool() {
+function sylPool(more) {
   const L = letters();
   const vs = L.filter(c => VOWELS.has(c)), cs = L.filter(c => !VOWELS.has(c));
   const out = new Set();
   for (const v of vs) for (const c of cs) { if (c !== 'ğ') out.add(c + v); out.add(v + c); }
+  // Hece çalışmasında kapalı heceler de (tan, ner, kil...) çıksın
+  if (more) for (const v of vs) for (const c of cs) for (const d of cs) if (c !== 'ğ') out.add(c + v + d);
   for (const w of wordPool()) for (const s of w.split('-')) out.add(s);
   return [...out];
 }
@@ -179,16 +181,28 @@ function letterView() {
 
 /* Heceler: kart çevirme */
 function nextSyl(first) {
-  const pool = sylPool();
-  cur.item = pick(pool, cur.item);
+  const pool = sylPool(true);
+  // son gösterilenleri tekrar etme (havuzun yarısı kadar, en çok 12)
+  const rec = cur.recent ||= [];
+  const fresh = pool.filter(x => !rec.includes(x));
+  cur.item = pick(fresh.length ? fresh : pool, cur.item);
+  rec.push(cur.item); while (rec.length > Math.min(12, Math.floor(pool.length / 2))) rec.shift();
   if (!first) render();
   say(cur.item, 0.7);
 }
 function sylView() {
+  const s = cur.item || '', L = new Set(letters());
+  // aynı ünsüzle başlayan hece ailesi
+  const c0 = s && !VOWELS.has(s[0]) ? s[0] : null;
+  const fam = c0 ? [...L].filter(v => VOWELS.has(v)).map(v => c0 + v) : [];
+  // bu heceyi içeren kelimeler
+  const ex = s ? wordPool().filter(w => w.split('-').includes(s)).sort(() => Math.random() - .5).slice(0, 6) : [];
   return header('Heceler') + `
     <div class="stage">
-      <div class="big-card syl" data-act="say-syl" data-v="${cur.item || ''}">${colorize(cur.item || '')}</div>
+      <div class="big-card syl" data-act="say-syl" data-v="${s}">${colorize(s)}</div>
       <p class="hint">Hecenin üstüne dokun, tekrar dinle</p>
+      ${fam.length > 1 ? `<div class="row">${fam.map(f => `<button class="chip ${f === s ? 'on' : ''}" data-act="say-syl" data-v="${f}">${f}</button>`).join('')}</div>` : ''}
+      ${ex.length ? `<p class="hint">Bu heceyi içeren kelimeler</p><div class="row">${ex.map(w => { const p = w.replace(/-/g, ''); return `<button class="btn ghost" data-act="say-word" data-v="${w}">${EMOJI[p] || ''} ${p}</button>`; }).join('')}</div>` : ''}
       <div class="row">
         <button class="btn big ghost" data-act="blend">🔤 Birleştir</button>
         <button class="btn big" data-act="next-syl">Sıradaki ➡️</button>

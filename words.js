@@ -26,6 +26,9 @@ dağ ağ a-ğaç yağ sı-ğır o-ğul doğ-ru a-ğız bağ yağ-mur tuğ-la bu�
 fil fa-re fı-rın fın-dık fi-dan film fe-ner fi-yat fut-bol fır-ça ka-fa sof-ra sı-nıf haf-ta köf-te kaf-tan def-ter fiş fi-kir fır-tı-na zarf se-def zü-ra-fa
 jü-ri je-ton ji-let ga-raj ba-gaj a-jan-da a-jan plaj pi-ja-ma ma-saj ej-der jim-nas-tik ja-pon
 var ev va-zo va-pur o-va dev vi-da va-tan ka-vun ta-vuk ha-vuç ha-vuz ha-va yu-va ce-viz da-vul av-cı e-vet ö-dev kah-ve gü-ver-cin tav-şan ta-van va-gon çi-vi la-va-bo se-vinç ko-va kav-ga hay-van kar-puz
+in it ni ti nin nit tin tit ni-ne nin-ni i-nan a-ni an-ne-ni e-ti it-ti et-ti an-nen ni-nen na-nen
+tan at-tan an-te-ni a-ta ni-ne-ne e-ti-ne tat na-ne an-ne ten-te
+on ol no to lo ot o-lan ol-ta no-ta a-lo o-na ton not nat o-nat o-tel ot-lat ot-ta ton-ton
 `.split(/\s+/).filter(Boolean).map(w => w.toLocaleLowerCase('tr-TR'));
 
 // Okuduktan sonra gösterilen küçük ödül resimleri
