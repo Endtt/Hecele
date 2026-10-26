@@ -33,7 +33,7 @@ function save() { try { localStorage.setItem('hecele', JSON.stringify(S)); } cat
 /* ---------- Ses ---------- */
 const synth = window.speechSynthesis;
 let voice = null;
-let lastSpeechError = '';
+let speechLog = [];
 function pickVoice() {
   const vs = synth.getVoices();
   voice = vs.find(v => v.lang.replace('_', '-').toLowerCase().startsWith('tr')) || null;
@@ -48,9 +48,11 @@ function say(parts, rate = 0.8) {
     if (!voice) pickVoice();
     for (const p of list) {
       const u = new SpeechSynthesisUtterance(p);
-      u.lang = 'tr-TR'; if (voice) u.voice = voice;
+      u.lang = 'tr-TR';   // iOS lang'a bakıp Türkçe sesi kendisi seçer; voice atamak bazen sesi susturuyor
       u.rate = rate;
-      u.onerror = e => { lastSpeechError = e.error || 'bilinmeyen hata'; };
+      u.onstart = () => speechLog.push('başladı');
+      u.onend = () => speechLog.push('bitti');
+      u.onerror = e => speechLog.push('hata: ' + e.error);
       synth.speak(u);
     }
     if (synth.paused) synth.resume();
@@ -317,8 +319,8 @@ $app.addEventListener('click', e => {
     case 'answer': answer(el); break;
     case 'less': S.unlocked = Math.max(1, S.unlocked - 1); save(); render(); break;
     case 'more': S.unlocked = Math.min(ORDER.length, S.unlocked + 1); save(); render(); break;
-    case 'test-voice': say('Merhaba Atlas, hecele ile okumayı öğrenelim', 0.8);
-      setTimeout(() => { const i = document.getElementById('voice-info'); if (i) i.textContent = voiceInfo() + (lastSpeechError ? ` (hata: ${lastSpeechError})` : ''); }, 1500); break;
+    case 'test-voice': speechLog = []; say('Merhaba Atlas, hecele ile okumayı öğrenelim', 0.8);
+      setTimeout(() => { const i = document.getElementById('voice-info'); if (i) i.textContent = voiceInfo() + ' | Son deneme: ' + (speechLog.join(' > ') || 'hiçbir şey olmadı'); }, 3500); break;
     case 'reset-stars': S.stars = 0; save(); render(); break;
   }
 });
