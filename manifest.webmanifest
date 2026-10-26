@@ -1,0 +1,9 @@
+{
+  "name": "Hecele",
+  "short_name": "Hecele",
+  "lang": "tr",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fff8e1",
+  "theme_color": "#ffd93d"
+}
