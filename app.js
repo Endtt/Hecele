@@ -36,7 +36,9 @@ let voice = null;
 let speechLog = [];
 function pickVoice() {
   const vs = synth.getVoices();
-  voice = vs.find(v => v.lang.replace('_', '-').toLowerCase().startsWith('tr')) || null;
+  const tr = vs.filter(v => v.lang.replace('_', '-').toLowerCase().startsWith('tr'));
+  // Gelişmiş/Premium (indirilmiş) ses varsa onu tercih et
+  voice = tr.find(v => /premium|enhanced|gelişmiş/i.test(v.name + ' ' + v.voiceURI)) || tr[0] || null;
 }
 if (synth) { pickVoice(); synth.addEventListener?.('voiceschanged', pickVoice); synth.onvoiceschanged = pickVoice; }
 
@@ -48,7 +50,8 @@ function say(parts, rate = 0.8) {
     if (!voice) pickVoice();
     for (const p of list) {
       const u = new SpeechSynthesisUtterance(p);
-      u.lang = 'tr-TR';   // iOS lang'a bakıp Türkçe sesi kendisi seçer; voice atamak bazen sesi susturuyor
+      u.lang = 'tr-TR';
+      if (voice && /premium|enhanced|gelişmiş/i.test(voice.name + ' ' + voice.voiceURI)) u.voice = voice;  // varsayılan sesi iOS seçer, iyi sesi biz
       u.rate = rate;
       u.onstart = () => speechLog.push('başladı');
       u.onend = () => speechLog.push('bitti');
