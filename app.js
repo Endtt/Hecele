@@ -359,26 +359,70 @@ function writeLetter() { const L = letters(); const c = L[Math.min(cur.wi, L.len
 function initCanvas() {
   const cv = document.getElementById('pad'); if (!cv) return;
   const dpr = window.devicePixelRatio || 1;
-  const w = Math.min(window.innerWidth - 32, 560), h = Math.min(window.innerHeight * 0.42, 380);
+  const w = Math.floor(Math.min(window.innerWidth - 32, 560)), h = Math.floor(Math.min(window.innerHeight * 0.42, 380));
   cv.style.width = w + 'px'; cv.style.height = h + 'px'; cv.width = w * dpr; cv.height = h * dpr;
   const g = cv.getContext('2d'); g.scale(dpr, dpr);
+  const font = `800 ${h * 0.95}px ui-rounded, "SF Pro Rounded", system-ui, sans-serif`;
+  const layer = () => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c.getContext('2d', { willReadFrequently: true }); };
+  const ink = layer(), thin = layer(), mask = layer(), maskDil = layer();   // kontrol için görünmez katmanlar
+  const glyph = (x, dil) => { x.font = font; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#000'; x.fillText(writeLetter(), w / 2, h * 0.55); if (dil) { x.lineWidth = 44; x.lineJoin = 'round'; x.strokeText(writeLetter(), w / 2, h * 0.55); } };
   const guide = () => {
     g.clearRect(0, 0, w, h);
-    g.fillStyle = '#e6e1cf'; g.font = `800 ${h * 0.95}px ui-rounded, "SF Pro Rounded", system-ui, sans-serif`;
-    g.textAlign = 'center'; g.textBaseline = 'middle';
+    for (const x of [ink, thin, mask, maskDil]) x.clearRect(0, 0, w, h);
+    glyph(mask, false); glyph(maskDil, true);
+    g.fillStyle = '#e6e1cf'; g.font = font; g.textAlign = 'center'; g.textBaseline = 'middle';
     g.fillText(writeLetter(), w / 2, h * 0.55);
     g.strokeStyle = '#d6d0ba'; g.setLineDash([6, 8]); g.lineWidth = 2;
     for (const y of [h * 0.18, h * 0.55, h * 0.92]) { g.beginPath(); g.moveTo(8, y); g.lineTo(w - 8, y); g.stroke(); }
     g.setLineDash([]);
+    g.lineWidth = 16; g.lineCap = 'round'; g.lineJoin = 'round';
+    for (const [x, lw] of [[ink, 44], [thin, 16]]) { x.lineWidth = lw; x.lineCap = 'round'; x.lineJoin = 'round'; x.strokeStyle = '#000'; }
   };
   guide(); cv._redraw = guide;
-  g.lineWidth = 16; g.lineCap = 'round'; g.lineJoin = 'round';
-  let drawing = false;
+
+  // Harf yeterince kaplandı mı? (kalın iz harfin ne kadarını örtüyor, ince iz harfin dışına taşıyor mu)
+  const check = () => {
+    const m = mask.getImageData(0, 0, w, h).data, k = ink.getImageData(0, 0, w, h).data;
+    const t = thin.getImageData(0, 0, w, h).data, d = maskDil.getImageData(0, 0, w, h).data;
+    let glyphPx = 0, covered = 0, inkPx = 0, spill = 0;
+    for (let i = 3; i < m.length; i += 12) {   // her 3. piksel
+      if (m[i] > 128) { glyphPx++; if (k[i] > 0) covered++; }
+      if (t[i] > 0) { inkPx++; if (d[i] < 128) spill++; }
+    }
+    return glyphPx > 0 && covered / glyphPx >= 0.55 && inkPx > 40 && spill / inkPx <= 0.6;
+  };
+  cv._check = check;
+
+  let drawing = false, done = false;
   const pos = e => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
-  cv.addEventListener('pointerdown', e => { drawing = true; cv.setPointerCapture(e.pointerId); const [x, y] = pos(e); g.strokeStyle = '#1d4ed8'; g.beginPath(); g.moveTo(x, y); g.lineTo(x + 0.1, y + 0.1); g.stroke(); });
-  cv.addEventListener('pointermove', e => { if (!drawing) return; const [x, y] = pos(e); g.lineTo(x, y); g.stroke(); });
-  const stop = () => { drawing = false; };
+  cv.addEventListener('pointerdown', e => {
+    if (done) return;
+    drawing = true; cv.setPointerCapture(e.pointerId);
+    const [x, y] = pos(e); g.strokeStyle = '#1d4ed8';
+    for (const c of [g, ink, thin]) { c.beginPath(); c.moveTo(x, y); c.lineTo(x + 0.1, y + 0.1); c.stroke(); }
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!drawing) return; const [x, y] = pos(e);
+    for (const c of [g, ink, thin]) { c.lineTo(x, y); c.stroke(); }
+  });
+  const stop = () => {
+    if (!drawing) return; drawing = false;
+    if (!done && check()) { done = true; writeSuccess(); }
+  };
   cv.addEventListener('pointerup', stop); cv.addEventListener('pointercancel', stop);
+}
+function writeSuccess() {
+  const L = letters(), c = L[Math.min(cur.wi, L.length - 1)];
+  const last = cur.upper && cur.wi >= L.length - 1;
+  const note = document.querySelector('.hint'); if (note) note.textContent = last ? '🎉 Bütün harfleri yazdın!' : '✅ Aferin!';
+  document.getElementById('pad')?.classList.add('ok');
+  say(last ? 'Bütün harfleri yazdın!' : 'Aferin!', 0.9);
+  setTimeout(() => {
+    if (view !== 'write') return;
+    if (!cur.upper) cur.upper = true;                       // önce küçük harf, sonra büyüğü
+    else if (cur.wi < L.length - 1) { cur.wi++; cur.upper = false; }
+    render();
+  }, 1300);
 }
 
 /* Albüm */
