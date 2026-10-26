@@ -181,25 +181,26 @@ function letterView() {
 
 /* Heceler: kart çevirme */
 function nextSyl(first) {
-  const pool = sylPool(true);
+  const pool = [...sylPool(true), ...wordPool().filter(w => w.includes('-'))];  // heceler + çok heceli kelimeler
   // son gösterilenleri tekrar etme (havuzun yarısı kadar, en çok 12)
   const rec = cur.recent ||= [];
   const fresh = pool.filter(x => !rec.includes(x));
   cur.item = pick(fresh.length ? fresh : pool, cur.item);
   rec.push(cur.item); while (rec.length > Math.min(12, Math.floor(pool.length / 2))) rec.shift();
   if (!first) render();
-  say(cur.item, 0.7);
+  say(cur.item.replace(/-/g, ''), 0.7);
 }
+const colorWord = w => w.split('-').map(p => `<span class="sy">${colorize(p)}</span>`).join('');
 function sylView() {
-  const s = cur.item || '', L = new Set(letters());
+  const raw = cur.item || '', isW = raw.includes('-'), s = raw.replace(/-/g, ''), L = new Set(letters());
   // aynı ünsüzle başlayan hece ailesi
-  const c0 = s && !VOWELS.has(s[0]) ? s[0] : null;
+  const c0 = s && !isW && !VOWELS.has(s[0]) ? s[0] : null;
   const fam = c0 ? [...L].filter(v => VOWELS.has(v)).map(v => c0 + v) : [];
   // bu heceyi içeren kelimeler
-  const ex = s ? wordPool().filter(w => w.split('-').includes(s)).sort(() => Math.random() - .5).slice(0, 6) : [];
+  const ex = s && !isW ? wordPool().filter(w => w.split('-').includes(s)).sort(() => Math.random() - .5).slice(0, 6) : [];
   return header('Heceler') + `
     <div class="stage">
-      <div class="big-card syl" data-act="say-syl" data-v="${s}">${colorize(s)}</div>
+      <div class="big-card syl" data-act="say-syl" data-v="${s}">${isW ? colorWord(raw) : colorize(s)}</div>
       <p class="hint">Hecenin üstüne dokun, tekrar dinle</p>
       ${fam.length > 1 ? `<div class="row">${fam.map(f => `<button class="chip ${f === s ? 'on' : ''}" data-act="say-syl" data-v="${f}">${f}</button>`).join('')}</div>` : ''}
       ${ex.length ? `<p class="hint">Bu heceyi içeren kelimeler</p><div class="row">${ex.map(w => { const p = w.replace(/-/g, ''); return `<button class="btn ghost" data-act="say-word" data-v="${w}">${EMOJI[p] || ''} ${p}</button>`; }).join('')}</div>` : ''}
@@ -552,7 +553,7 @@ function albumView() {
 function blend() {
   const card = document.querySelector('.big-card.syl'); if (!card || !cur.item) return;
   const spans = [...card.querySelectorAll('.v,.c')];
-  say(cur.item, 0.5);
+  say(cur.item.replace(/-/g, ''), 0.5);
   spans.forEach((sp, i) => setTimeout(() => { spans.forEach(x => x.classList.remove('hl')); sp.classList.add('hl'); }, i * 550));
   setTimeout(() => spans.forEach(x => x.classList.remove('hl')), spans.length * 550 + 500);
 }
