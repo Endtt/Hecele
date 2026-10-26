@@ -278,7 +278,7 @@ function voiceInfo() {
   if (!synth) return 'Bu tarayıcı sesli okumayı desteklemiyor. Safari ya da Chrome kullanın.';
   if (!voice) pickVoice();
   return voice
-    ? `Türkçe ses bulundu: ${voice.name}`
+    ? `Türkçe ses bulundu: ${voice.name}. Safari'nin gösterdiği Türkçe sesler: ` + synth.getVoices().filter(v => v.lang.replace('_', '-').toLowerCase().startsWith('tr')).map(v => v.name).join(', ')
     : 'Türkçe ses bulunamadı. iPad: Ayarlar > Erişilebilirlik > Seslendirilen İçerik > Sesler > Türkçe sesi indirin. Ayrıca sessiz modu ve ses seviyesini kontrol edin.';
 }
 function settingsView() {
