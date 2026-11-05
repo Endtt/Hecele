@@ -34,4 +34,7 @@ const SENTENCES = [
   'Anne, iki tane lale ek.', 'Kenan, not et, ilan ilet.', 'Okan, kanala in, olta at.', 'İlke, lale ile toka tak.', 'Ekin, iki tane kanola ek.',
   'Lale, nane ek, lale kokla.', 'Nil, ilk naneli keki tat.', 'Okan, kano ile kanala in.', 'Nail, iki tane inek otlat.', 'Ela, etek al, etiketini tak.',
   'Lale, laleni kokla, nane ek.', 'Nail, inek otlat, kanola ek.', 'Altan, kalene iki kilit tak.', 'Nalan, koala taklit et, atla.', 'Nil, kaliteli keten etek al.',
+  // Okuma metinleri (Onat, Tekne)
+  'Alo Onat, alo.', 'Elli ton ot al.', 'On tane at otlat.', 'Ninen ile at otlat.',
+  'Kilitli olan ne?', 'Kilitli olan tekne.', 'O tekne Tekin’in,', 'Tekin’e olta iletin.',
 ];

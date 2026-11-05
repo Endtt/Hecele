@@ -21,4 +21,10 @@ const BOOKS = [
     ['Atlas sabah kalktı.', '🛏️'], ['Dişlerini fırçaladı.', '🪥'], ['Kahvaltı yaptı.', '🍳'],
     ['Okula gitti.', '🏫'], ['Kitap okudu.', '📖'], ['Eve geldi.', '🏠'], ['Atlas uyudu.', '🌙'],
   ] },
+  { title: 'Onat', emoji: '📞', pages: [
+    ['Alo Onat, alo.', '📞'], ['Elli ton ot al.', '🌿'], ['On tane at otlat.', '🐴'], ['Ninen ile at otlat.', '👵'],
+  ] },
+  { title: 'Tekne', emoji: '⛵', pages: [
+    ['Kilitli olan ne?', '🔒'], ['Kilitli olan tekne.', '⛵'], ['O tekne Tekin’in,', '🚤'], ['Tekin’e olta iletin.', '🎣'],
+  ] },
 ];

@@ -32,7 +32,7 @@ on ol no to lo ot o-lan ol-ta no-ta a-lo o-na ton not nat o-nat o-tel ot-lat ot-
 // Okuma çarkları (lolipop) ve cümle kartlarından
 kul kut-la ku-kla ko-nu ko-nuk ko-nut u-nut u-nut-kan ot-lu ko-ku-lu o-luk tut-kal Ut-ku Tu-na kol-luk o-kul-lu ka-nun ka-ka-o ka-ka-o-lu o-nu u-lu
 kal-kan Al-kan E-kin O-kan Ka-an Te-kin il-ke et-ki ki-lit ta-ka le-ke te-ke to-ka i-nek ot-lak ke-ten kok-la ke-kik tank nok-ta kek-lik e-tek til-ki ke-lek ko-a-la kot kin tek
-an-ten e-ti-ket at-let te-ne-ke ko-nak ol-ta no-ta ka-no ka-no-la tak-lit tek-ne an-tik ki-lit-li ka-li-te-li i-lan i-let
+el-li o-nat ot-lat ni-nen i-le-tin an-ten e-ti-ket at-let te-ne-ke ko-nak ol-ta no-ta ka-no ka-no-la tak-lit tek-ne an-tik ki-lit-li ka-li-te-li i-lan i-let
 `.split(/\s+/).filter(Boolean).map(w => w.toLocaleLowerCase('tr-TR'));
 
 // Okuduktan sonra gösterilen küçük ödül resimleri
