@@ -82,6 +82,10 @@ function wordPool() {
   const L = new Set(letters());
   return [...new Set(WORDS)].filter(w => [...w.replace(/-/g, '')].every(c => L.has(c)));
 }
+function drillPool() {
+  const L = new Set(letters());
+  return [...new Set(DRILL)].filter(w => [...w.replace(/-/g, '')].every(c => L.has(c)));
+}
 function sylPool(more) {
   const L = letters();
   const vs = L.filter(c => VOWELS.has(c)), cs = L.filter(c => !VOWELS.has(c));
@@ -181,7 +185,7 @@ function letterView() {
 
 /* Heceler: kart çevirme */
 function nextSyl(first) {
-  const pool = [...sylPool(true), ...wordPool().filter(w => w.includes('-'))];  // heceler + çok heceli kelimeler
+  const pool = [...new Set([...sylPool(true), ...wordPool().filter(w => w.includes('-')), ...drillPool()])];  // heceler + çok heceli kelimeler
   // son gösterilenleri tekrar etme (havuzun yarısı kadar, en çok 12)
   const rec = cur.recent ||= [];
   const fresh = pool.filter(x => !rec.includes(x));

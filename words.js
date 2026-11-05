@@ -29,6 +29,10 @@ var ev va-zo va-pur o-va dev vi-da va-tan ka-vun ta-vuk ha-vuç ha-vuz ha-va yu-
 in it ni ti nin nit tin tit ni-ne nin-ni i-nan a-ni an-ne-ni e-ti it-ti et-ti an-nen ni-nen na-nen
 tan at-tan an-te-ni a-ta ni-ne-ne e-ti-ne tat na-ne an-ne ten-te
 on ol no to lo ot o-lan ol-ta no-ta a-lo o-na ton not nat o-nat o-tel ot-lat ot-ta ton-ton
+// Okuma çarkları (lolipop) ve cümle kartlarından
+kul kut-la ku-kla ko-nu ko-nuk ko-nut u-nut u-nut-kan ot-lu ko-ku-lu o-luk tut-kal Ut-ku Tu-na kol-luk o-kul-lu ka-nun ka-ka-o ka-ka-o-lu o-nu u-lu
+kal-kan Al-kan E-kin O-kan Ka-an Te-kin il-ke et-ki ki-lit ta-ka le-ke te-ke to-ka i-nek ot-lak ke-ten kok-la ke-kik tank nok-ta kek-lik e-tek til-ki ke-lek ko-a-la kot kin tek
+an-ten e-ti-ket at-let te-ne-ke ko-nak ol-ta no-ta ka-no ka-no-la tak-lit tek-ne an-tik ki-lit-li ka-li-te-li i-lan i-let
 `.split(/\s+/).filter(Boolean).map(w => w.toLocaleLowerCase('tr-TR'));
 
 // Okuduktan sonra gösterilen küçük ödül resimleri
@@ -46,3 +50,12 @@ const EMOJI = {
   maymun: '🐒', kaplumbağa: '🐢', yaprak: '🍃', çorap: '🧦', pamuk: '☁️', pil: '🔋', kitap: '📖',
   telefon: '📱', lamba: '💡', ışık: '💡', mum: '🕯️', ip: '🧵', kuğu: '🦢', kuzu: '🐑', ceylan: '🦌',
 };
+
+// Hece/okuma çalışması (lolipop çarkları): anlamsız hece ve sözcükler de dahil; resimli kelime testine girmez.
+// Uygulama, açılmış harflerle yazılabilenleri Heceler ekranında gösterir.
+const DRILL = `
+ut ul un uk nu ku tu lu on-lu u-lu o-nu ko-nu ku-le o-kul ku-tu ko-ku kul Ut-ku ku-lak o-kul-lu kol-luk u-nut ko-nut kuk-la Tu-na ko-nuk ka-nun kut-la
+Ut-kan ka-ka-o-lu u-nut-kan ot-lu ko-ku-lu o-luk tut-kal
+ak ek ik ok ka ke ki ko kek kik kal kel kol kot kat kin tak tik tek kan ilk i-ki ka-le ko-kla ke-ten Te-kin
+ke-kik ka-ka-o tank nok-ta kek-lik e-tek til-ki ke-lek et-ki ki-lit ta-ka le-ke te-ke to-ka i-nek ot-lak kal-kan Al-kan E-kin O-kan il-ke Ka-an ko-a-la e-nik ko-li kan-ka
+`.split(/\s+/).filter(Boolean).map(w => w.toLocaleLowerCase('tr-TR'));
