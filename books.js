@@ -27,4 +27,10 @@ const BOOKS = [
   { title: 'Tekne', emoji: '⛵', pages: [
     ['Kilitli olan ne?', '🔒'], ['Kilitli olan tekne.', '⛵'], ['O tekne Tekin’in,', '🚤'], ['Tekin’e olta iletin.', '🎣'],
   ] },
+  { title: 'Kakaolu Kek', emoji: '🧁', pages: [
+    ['Tuna ne koktu?', '👦'], ['Kakaolu kek koktu.', '🧁'], ['Elli tane kek kutula.', '📦'], ['Utku ile ilet okula.', '🏫'],
+  ] },
+  { title: 'Ruken ile Rana', emoji: '📖', pages: [
+    ['Ruken erken kalkar.', '⏰'], ['Tekli koltukta oturur.', '🛋️'], ['Rana ona Kirli Rakun’u okur.', '📖'], ['Korkak Tekir’i okur.', '🐱'],
+  ] },
 ];

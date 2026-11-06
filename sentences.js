@@ -37,4 +37,7 @@ const SENTENCES = [
   // Okuma metinleri (Onat, Tekne)
   'Alo Onat, alo.', 'Elli ton ot al.', 'On tane at otlat.', 'Ninen ile at otlat.',
   'Kilitli olan ne?', 'Kilitli olan tekne.', 'O tekne Tekin’in,', 'Tekin’e olta iletin.',
+  // Okuma metinleri (Kakaolu Kek, Ruken ile Rana)
+  'Tuna ne koktu?', 'Kakaolu kek koktu.', 'Elli tane kek kutula.', 'Utku ile ilet okula.',
+  'Ruken erken kalkar.', 'Tekli koltukta oturur.', 'Rana ona Kirli Rakun’u okur.', 'Korkak Tekir’i okur.',
 ];
