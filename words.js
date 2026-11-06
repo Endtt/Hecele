@@ -38,7 +38,7 @@ el-li o-nat ot-lat ni-nen i-le-tin an-ten e-ti-ket at-let te-ne-ke ko-nak ol-ta 
 
 // Okuduktan sonra gösterilen küçük ödül resimleri
 const EMOJI = {
-  el: '✋', ela: '👧', ala: '🎨', ak: '🤍', kale: '🏰', lale: '🌷', kek: '🧁', koltuk: '🛋️', rakun: '🦝', tekir: '🐱', inek: '🐄', kilo: '⚖️',
+  el: '✋', ela: '👧', ala: '🎨', ak: '🤍', kale: '🏰', lale: '🌷', kek: '🧁', roket: '🚀', erik: '🟣', tarak: '💇', kart: '🪪', turna: '🦢', koltuk: '🛋️', rakun: '🦝', tekir: '🐱', inek: '🐄', kilo: '⚖️',
   elma: '🍎', kalem: '✏️', melek: '👼', muz: '🍌', okul: '🏫', kulak: '👂', tilki: '🦊', tane: '🔹',
   kutu: '📦', üzüm: '🍇', öküz: '🐂', ütü: '👔', kürek: '🏖️', arı: '🐝', kedi: '🐱', oda: '🚪',
   su: '💧', masa: '🪑', kasa: '🧰', süt: '🥛', balon: '🎈', balık: '🐟', bebek: '👶', kabak: '🎃',
@@ -59,4 +59,7 @@ ut ul un uk nu ku tu lu on-lu u-lu o-nu ko-nu ku-le o-kul ku-tu ko-ku kul Ut-ku 
 Ut-kan ka-ka-o-lu u-nut-kan ot-lu ko-ku-lu o-luk tut-kal
 ak ek ik ok ka ke ki ko kek kik kal kel kol kot kat kin tak tik tek kan ilk i-ki ka-le ko-kla ke-ten Te-kin
 ke-kik ka-ka-o tank nok-ta kek-lik e-tek til-ki ke-lek et-ki ki-lit ta-ka le-ke te-ke to-ka i-nek ot-lak kal-kan Al-kan E-kin O-kan il-ke Ka-an ko-a-la e-nik ko-li kan-ka
+// R lolipopu (çark): hece ve sözcükler
+ar er ir or ur ra re ri ro ru ter kor tur nar kar kir kur ra-na Nur-ten Ru-ken Ta-ner O-nur E-ren Nur
+ren-kli ka-re-li kar-ne kor-na tur-na ro-ket ku-ral kart ku-ru ku-ra ek-ler tart renk e-rik ter-lik a-ra te-re rak ta-rak rik ka-ra ki-ra li-ra i-ri
 `.split(/\s+/).filter(Boolean).map(w => w.toLocaleLowerCase('tr-TR'));
