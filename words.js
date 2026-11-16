@@ -72,4 +72,5 @@ Ir-mak a-kıl-lı ta-nı-rım ko-mu-tan an-la-rım an-la-tı-rım
 man-to ke-man Me-tin Ke-rem ku-le E-mi-ne kı-rık Ül-kü Tü-lin ö-nem-li Su-de Si-nan te-ker-le-me ko-mik Rü-ya kı-na Ser-kan ko-yun zey-tin
 De-met Zi-ya do-kuz Çı-nar çe-kir-dek Bu-rak sa-rıl-dı Gam-ze ba-li-na Ca-nan su-la-dı Şa-kir so-da şi-şe Şe-nay Şen-gül Gö-nül
 Poy-raz pa-zar pat-lı-can por-ta-kal kar-puz Pı-nar Kar-ga pey-nir Ha-san has-ta-lan-dı Ve-dat viş-ne ka-vun ki-vi Çağ-rı Fa-re fın-dık fıs-tık ce-viz Ja-le Ja-pon-ya ju-do
+nal Nil Ta-lat an-ne-ni ni-ne-ni an-la a-i-le Na-il Na-lan İ-nal İ-nan ta-ti-li-ni at-let li-la Ta-ner i-ki-li et-li Me-te ro-man U-mut li-mon-lu lo-kum un-lu ki-min A-nıl a-tı
 `.split(/\s+/).filter(Boolean).map(w => w.toLocaleLowerCase('tr-TR'));
