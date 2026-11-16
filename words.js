@@ -62,4 +62,14 @@ ke-kik ka-ka-o tank nok-ta kek-lik e-tek til-ki ke-lek et-ki ki-lit ta-ka le-ke 
 // R lolipopu (çark): hece ve sözcükler
 ar er ir or ur ra re ri ro ru ter kor tur nar kar kir kur ra-na Nur-ten Ru-ken Ta-ner O-nur E-ren Nur
 ren-kli ka-re-li kar-ne kor-na tur-na ro-ket ku-ral kart ku-ru ku-ra ek-ler tart renk e-rik ter-lik a-ra te-re rak ta-rak rik ka-ra ki-ra li-ra i-ri
+o ot ne e-li-ne O-nat Ton-ton on not ol-ta o-tel an-lat ta-ne İl-ke Nil kek kal ko-nak To-kat
+O-kan tak-la tek Te-kin Ke-nan kalk tat i-nek E-kin Ka-an Ut-ku kok-tu Tut-ku Tu-na o-ku ko-nu ko-nuk Ku-le-li ko-nut
+Ra-na İl-ker a-ra ta-rak ter-lik ka-re-li Tu-ran er-ken e-rik kan-tar i-ri e-ti-ket
+i-nek-ler kurt-lar kar-tal-lar at-lar ra-kun-lar til-ki-ler A-kın at-kı ta-kı al-tın ka-lın tak
+A-nıl a-rı ta-nır nek-tar ka-nat-lı kul-la-nır Ta-rık al-tı kat-lı ki-ra-lık ta-nıt-tı an-lat-tı
+Mi-ne el-ma a-la-lım ni-nem Me-ral mut-lu mar-ket li-mon ek-mek ar-mut lo-kum
+Ir-mak a-kıl-lı ta-nı-rım ko-mu-tan an-la-rım an-la-tı-rım
+man-to ke-man Me-tin Ke-rem ku-le E-mi-ne kı-rık Ül-kü Tü-lin ö-nem-li Su-de Si-nan te-ker-le-me ko-mik Rü-ya kı-na Ser-kan ko-yun zey-tin
+De-met Zi-ya do-kuz Çı-nar çe-kir-dek Bu-rak sa-rıl-dı Gam-ze ba-li-na Ca-nan su-la-dı Şa-kir so-da şi-şe Şe-nay Şen-gül Gö-nül
+Poy-raz pa-zar pat-lı-can por-ta-kal kar-puz Pı-nar Kar-ga pey-nir Ha-san has-ta-lan-dı Ve-dat viş-ne ka-vun ki-vi Çağ-rı Fa-re fın-dık fıs-tık ce-viz Ja-le Ja-pon-ya ju-do
 `.split(/\s+/).filter(Boolean).map(w => w.toLocaleLowerCase('tr-TR'));
